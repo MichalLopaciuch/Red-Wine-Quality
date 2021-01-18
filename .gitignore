@@ -1,0 +1,5 @@
+docs/RedWineQuality.pages
+**/__pycache__/**
+.vscode
+logs/results.log
+venv
