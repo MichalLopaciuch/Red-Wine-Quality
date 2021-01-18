@@ -1,34 +1,44 @@
 """
 @author: Michał Łopaciuch
-@date: 16.01.21
+@date: 18.01.21
 """
 
-import matplotlib.pyplot as plt
-from src.logger import Logger
-from os import path
-import pandas
 import numpy
+import pandas
+from os import path
+from src.const import (
+    __DATA_SOURCE_FILE__,
+    __CONSOLE__
+)
+import matplotlib.pyplot as plt
 
-__DATA_SOURCE_FILE__ = 'winequality-red.csv'
+
+def preliminary_informations(df):
+    """A function used to collect basic informations about the dataset."""
+    __CONSOLE__.log(numpy.where(pandas.isnull(df)),
+                    'Null values in dataset')
+
+    mode = []
+    for col in df:
+        __CONSOLE__.log(f'Max: {df[col].max()} Min: {df[col].min()} Mean: {df[col].mean()}',
+                        f'Basic info for {col}')
+        if col not in ['free sulfur dioxide', 'quality']:
+            mode.append([col, float(df[col].mode())])
+        print(col, float(df[col].mode()))
+    __CONSOLE__.log(mode, 'mode for pie chart')
+
+    labels, sizes = [row[0] for row in mode], [row[1] for row in mode]
+
+    y_pos = numpy.arange(len(labels))
+    plt.bar(y_pos, sizes, align='center', alpha=0.5)
+    plt.xticks(y_pos, labels)
+    plt.title('Component')
+    plt.ylabel('Mode')
+
+    plt.show()
 
 
 def run():
-    console = Logger()
+    """A main function with bussiness logic."""
     df = pandas.read_csv(path.join('data', __DATA_SOURCE_FILE__))
-    console.log(numpy.where(pandas.isnull(df)), 'Null values in dataset')
-    quantity = []
-    for col in df:
-        console.log(f'Max: {df[col].max()} Min: {df[col].min()} Mean: {df[col].mean()}',
-                    f'Basic info for {col}')
-        quantity.append([col, float(df[col].mode())])
-    console.log(quantity, 'quantity for pie chart')
-
-    labels = [row[0] for row in quantity]
-    sizes = [row[1] for row in quantity]
-    explode = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.1)
-
-    fig1, ax1 = plt.subplots()
-    ax1.pie(sizes, explode=explode, labels=labels, autopct='%1.1f%%',
-            shadow=True, startangle=90)
-    ax1.axis('equal')
-    plt.show()
+    preliminary_informations(df)
